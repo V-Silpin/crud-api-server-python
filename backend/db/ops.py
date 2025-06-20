@@ -1,56 +1,61 @@
-import psycopg2
-
+from sqlalchemy import create_engine, MetaData, Table, Column, String, select, and_, text
+from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
 
-class PostgresOps:
+class SQLAlchemyOps:
     def __init__(self):
-                
         load_dotenv()
-
         database = os.getenv("DB_NAME")
         host = os.getenv("DB_HOST")
         user = os.getenv("DB_USER")
         password = os.getenv("DB_PASS")
         port = os.getenv("DB_PORT")
-
-        self.conn = psycopg2.connect(database=database,
-                        host=host,
-                        user=user,
-                        password=password,
-                        port=port)
-        self.cursor = self.conn.cursor()
+        url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+        self.engine = create_engine(url)
+        self.metadata = MetaData()
+        self.Session = sessionmaker(bind=self.engine)
+        self.session = self.Session()
 
     def create_table(self, table_name, columns):
-        columns_with_types = ', '.join([f"{col} TEXT" for col in columns])
-        create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_with_types});"
-        self.cursor.execute(create_table_query)
-        self.conn.commit()
+        table = Table(
+            table_name, self.metadata,
+            *(Column(col, String) for col in columns),
+            extend_existing=True
+        )
+        table.create(self.engine, checkfirst=True)
 
     def insert_data(self, table_name, data):
-        placeholders = ', '.join(['%s'] * len(data))
-        insert_query = f"INSERT INTO {table_name} VALUES ({placeholders})"
-        self.cursor.execute(insert_query, data)
-        self.conn.commit()
+        table = Table(table_name, self.metadata, autoload_with=self.engine)
+        ins = table.insert().values(dict(zip(table.columns.keys(), data)))
+        with self.engine.begin() as conn:
+            conn.execute(ins)
 
     def fetch_data(self, table_name):
-        fetch_query = f"SELECT * FROM {table_name}"
-        self.cursor.execute(fetch_query)
-        return self.cursor.fetchall()
-    
+        table = Table(table_name, self.metadata, autoload_with=self.engine)
+        stmt = select(table)
+        with self.engine.connect() as conn:
+            result = conn.execute(stmt)
+            return [dict(row) for row in result]
+
     def update_data(self, table_name, set_values, condition):
-        set_columns = ', '.join([f"{col}" for col in set_values.keys()])
-        condition_str = ' AND '.join([f"{col}" for col in condition.keys()])
-        update_query = f"UPDATE {table_name} SET {set_columns} WHERE {condition_str}"
-        self.cursor.execute(update_query, list(set_values.values()) + list(condition.values()))
-        self.conn.commit()
+        table = Table(table_name, self.metadata, autoload_with=self.engine)
+        stmt = table.update().where(
+            and_(*(getattr(table.c, k) == v for k, v in condition.items()))
+        ).values(**set_values)
+        with self.engine.begin() as conn:
+            conn.execute(stmt)
 
     def delete_data(self, table_name, condition):
-        condition_str = ' AND '.join([f"{col}" for col in condition.keys()])
-        delete_query = f"DELETE FROM {table_name} WHERE {condition_str}"
-        self.cursor.execute(delete_query, list(condition.values()))
-        self.conn.commit()
+        table = Table(table_name, self.metadata, autoload_with=self.engine)
+        stmt = table.delete().where(
+            and_(*(getattr(table.c, k) == v for k, v in condition.items()))
+        )
+        with self.engine.begin() as conn:
+            conn.execute(stmt)
 
     def close_connection(self):
-        self.cursor.close()
-        self.conn.close()
+        self.session.close()
+        self.engine.dispose()
+
+PostgresOps = SQLAlchemyOps
