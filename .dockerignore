@@ -1,0 +1,20 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Node.js
+frontend/node_modules
+
+# Ignore docs and config not needed in image
+backend/.gitignore
+backend/.python-version
+backend/README.md
+backend/pyproject.toml
+backend/uv.lock
