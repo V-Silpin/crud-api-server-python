@@ -25,7 +25,7 @@ This project is a full-stack CRUD (Create, Read, Update, Delete) web application
 
 1. **Clone the repository:**
    ```sh
-   git clone <your-repo-url>
+   git clone https://github.com/V-Silpin/crud-api-server-python.git
    cd crud-api-server-python
    ```
 2. **Start all services:**
