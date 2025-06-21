@@ -1,6 +1,3 @@
-// api.js
-// Functions to interact with the backend API for CRUD operations
-
 const BASE_URL = 'http://localhost:8000/items/';
 
 export async function fetchCourses() {

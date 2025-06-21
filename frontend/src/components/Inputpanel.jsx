@@ -24,7 +24,6 @@ const Inputpanel = ({ onSubmit, action, course }) => {
     if (onSubmit) onSubmit(form);
   };
 
-  // Color map for button
   const colorMap = {
     Create: 'bg-green-300 text-white border-green-700 hover:bg-green-600',
     Read: 'bg-blue-300 text-white border-blue-700 hover:bg-blue-600',

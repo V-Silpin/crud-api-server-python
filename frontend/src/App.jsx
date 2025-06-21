@@ -11,12 +11,10 @@ function App() {
   const [refresh, setRefresh] = useState(false);
   const [alertMsg, setAlertMsg] = useState(null);
 
-  // Fetch courses on mount and when refresh changes
   useEffect(() => {
     fetchCourses().then(setCourses);
   }, [refresh]);
 
-  // Handler for input panel submit
   const handleSubmit = async (form) => {
     try {
       let res;
@@ -30,7 +28,7 @@ function App() {
         res = await deleteCourse(form.id);
         setAlertMsg(res.message || 'Course deleted!');
       }
-      setRefresh((r) => !r); // trigger refresh
+      setRefresh((r) => !r);
     } catch (e) {
       setAlertMsg('Operation failed: ' + (e.message || 'Unknown error'));
     }
@@ -38,7 +36,6 @@ function App() {
 
   return (
     <>
-      {/* App Title */}
       <div className="w-full flex justify-center mb-8 mt-6">
         <h1 className="text-5xl font-extrabold text-blue-700 drop-shadow-lg tracking-wide">ZA CRUD</h1>
       </div>
@@ -51,7 +48,6 @@ function App() {
         </div>
       )}
       <div className="grid grid-cols-3 h-screen bg-gray-100 p-4">
-        {/* Action Buttons */}
         <div className="col-span-1 flex flex-col items-center justify-center gap-8">
           {['Create', 'Read', 'Update', 'Delete'].map((action) => {
             const colorMap = {
@@ -73,14 +69,10 @@ function App() {
           );
         })}
         </div>
-
-        {/* Table and Input Panel */}
         <div className='col-span-2 flex flex-col gap-4'>
           <div className="mb-6">
             <Table courses={courses} />
           </div>
-
-          {/* Input panel */}
           <div>
             <Inputpanel onSubmit={handleSubmit} action={selectedAction} course={selectedCourse} />
           </div>

@@ -20,7 +20,7 @@ class SQLAlchemyOps:
     def create_table(self, table_name, columns):
         table = Table(
             table_name, self.metadata,
-            Column('id', Integer),  # id as Integer
+            Column('id', Integer),
             *(Column(col, String) for col in columns if col != 'id'),
             extend_existing=True
         )
