@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, String, select, and_, text
+from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer, select, and_, text
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
@@ -20,9 +20,11 @@ class SQLAlchemyOps:
     def create_table(self, table_name, columns):
         table = Table(
             table_name, self.metadata,
-            *(Column(col, String) for col in columns),
+            Column('id', Integer),  # id as Integer
+            *(Column(col, String) for col in columns if col != 'id'),
             extend_existing=True
         )
+        table.drop(self.engine, checkfirst=True)
         table.create(self.engine, checkfirst=True)
 
     def insert_data(self, table_name, data):
@@ -36,7 +38,7 @@ class SQLAlchemyOps:
         stmt = select(table)
         with self.engine.connect() as conn:
             result = conn.execute(stmt)
-            return [dict(row) for row in result]
+            return [dict(row._mapping) for row in result]
 
     def update_data(self, table_name, set_values, condition):
         table = Table(table_name, self.metadata, autoload_with=self.engine)
