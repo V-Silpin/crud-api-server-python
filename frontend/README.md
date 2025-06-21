@@ -1,12 +1,47 @@
-# React + Vite
+# Frontend - CRUD API Server Python
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React frontend for the CRUD API Server Python project. It provides a modern, user-friendly interface for managing courses via the backend FastAPI API.
 
-Currently, two official plugins are available:
+## Tech Stack
+- **React** (with hooks)
+- **Vite** (for fast development and build)
+- **Tailwind CSS** (for styling)
+- **ESLint** (for code quality)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Add, view, edit, and delete courses
+- Responsive and clean UI
+- Interacts with the FastAPI backend via REST API
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Frontend code: `frontend/`
+
+You can run backend and frontend separately for development if you prefer:
+
+**Frontend:**
+```sh
+cd frontend
+npm install
+npm run dev
+```
+- The app will be available at [http://localhost:3000](http://localhost:3000)
+
+**Backend:**
+See the backend `README.md` for instructions on running the API server.
+
+## Project Structure
+- Main entry: `src/main.jsx`
+- App component: `src/App.jsx`
+- API logic: `src/api.js`
+- UI components: `src/components/`
+
+## Customization
+- Update API endpoint URLs in `src/api.js` if your backend runs on a different host/port.
+- Modify styles in `src/App.css` or use Tailwind classes.
+
+## Building for Production
+```sh
+npm run build
+```
+The production-ready files will be in the `dist/` directory.
