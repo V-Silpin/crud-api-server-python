@@ -64,7 +64,7 @@ function App() {
                 className={`w-48 h-20 text-2xl rounded-3xl font-bold shadow-lg transition-all duration-200 border-4 ${selectedAction === action ? selectedColor : defaultColor}`}
                 onClick={() => setSelectedAction(action)}
               >
-                {action} Button
+                {action}
               </button>
           );
         })}
