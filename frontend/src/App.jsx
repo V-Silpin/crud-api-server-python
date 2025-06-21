@@ -9,6 +9,7 @@ function App() {
   const [selectedAction, setSelectedAction] = useState('Read');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [alertMsg, setAlertMsg] = useState(null);
 
   // Fetch courses on mount and when refresh changes
   useEffect(() => {
@@ -18,16 +19,20 @@ function App() {
   // Handler for input panel submit
   const handleSubmit = async (form) => {
     try {
+      let res;
       if (selectedAction === 'Create') {
-        await createCourse(form);
+        res = await createCourse(form);
+        setAlertMsg(res.message || 'Course created!');
       } else if (selectedAction === 'Update') {
-        await updateCourse(form.id, form);
+        res = await updateCourse(form.id, form);
+        setAlertMsg(res.message || 'Course updated!');
       } else if (selectedAction === 'Delete') {
-        await deleteCourse(form.id);
+        res = await deleteCourse(form.id);
+        setAlertMsg(res.message || 'Course deleted!');
       }
       setRefresh((r) => !r); // trigger refresh
     } catch (e) {
-      alert('Operation failed: ' + e.message);
+      setAlertMsg('Operation failed: ' + (e.message || 'Unknown error'));
     }
   };
 
@@ -37,6 +42,14 @@ function App() {
       <div className="w-full flex justify-center mb-8 mt-6">
         <h1 className="text-5xl font-extrabold text-blue-700 drop-shadow-lg tracking-wide">ZA CRUD</h1>
       </div>
+      {alertMsg && (
+        <div className="w-full flex justify-center mb-4">
+          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded-lg shadow text-lg">
+            {alertMsg}
+            <button className="ml-4 text-blue-900 font-bold" onClick={() => setAlertMsg(null)}>&times;</button>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-3 h-screen bg-gray-100 p-4">
         {/* Action Buttons */}
         <div className="col-span-1 flex flex-col items-center justify-center gap-8">
