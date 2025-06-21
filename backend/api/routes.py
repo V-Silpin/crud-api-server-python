@@ -16,38 +16,39 @@ class Course(BaseModel):
     price: float
     
 
-@router.post("/items/", response_model=Course)
+@router.post("/items/")
 def create_item(item: Course):
     try:
         db.insert_data("items", [item.id, item.name, item.description, item.price])
-        return item
+        return {"message": "Course created successfully!", "course": item.dict()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/items/", response_model=List[Course])
+@router.get("/items/")
 def read_items():
     try:
-        rows = db.fetch_data("items")
-        return [Course(id=row[0], name=row[1], description=row[2], price=row[3]) for row in rows]
+        courses = db.fetch_data("items")
+        return courses
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/items/{item_id}", response_model=Course)
+@router.put("/items/{item_id}")
 def update_item(item_id: int, item: Course):
     try:
         db.update_data(
             "items",
-            {"name = %s": item.name, "description = %s": item.description, "price = %s": item.price},
-            {"id = %s": item_id}
+            {"name": item.name, "description": item.description, "price": item.price},
+            {"id": item_id}
         )
-        return item
+        return {"message": "Course updated successfully!", "course": item.dict()}
     except Exception as e:
+        print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/items/{item_id}")
 def delete_item(item_id: int):
     try:
-        db.delete_data("items", {"id = %s": item_id})
-        return {"detail": "Course deleted"}
+        db.delete_data("items", {"id": item_id})
+        return {"message": "Course deleted successfully!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
