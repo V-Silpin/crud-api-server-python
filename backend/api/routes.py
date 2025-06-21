@@ -7,6 +7,8 @@ router = APIRouter()
 
 db = PostgresOps()
 
+db.create_table("items", ["id", "name", "description", "price"])
+
 class Course(BaseModel):
     id: int
     name: str
@@ -17,7 +19,7 @@ class Course(BaseModel):
 @router.post("/items/", response_model=Course)
 def create_item(item: Course):
     try:
-        db.insert_data("items", [item.id, item.name, item.description])
+        db.insert_data("items", [item.id, item.name, item.description, item.price])
         return item
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -26,7 +28,7 @@ def create_item(item: Course):
 def read_items():
     try:
         rows = db.fetch_data("items")
-        return [Course(id=row[0], name=row[1], description=row[2]) for row in rows]
+        return [Course(id=row[0], name=row[1], description=row[2], price=row[3]) for row in rows]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -35,7 +37,7 @@ def update_item(item_id: int, item: Course):
     try:
         db.update_data(
             "items",
-            {"name = %s": item.name, "description = %s": item.description},
+            {"name = %s": item.name, "description = %s": item.description, "price = %s": item.price},
             {"id = %s": item_id}
         )
         return item
