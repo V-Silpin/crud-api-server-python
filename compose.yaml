@@ -12,6 +12,8 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - keploy-network
 
   backend:
     build: ./backend
@@ -24,6 +26,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    networks:
+      - keploy-network
 
   frontend:
     build: ./frontend
@@ -34,6 +38,12 @@ services:
       - backend
     volumes:
       - ./frontend:/app
+    networks:
+      - keploy-network
+
+networks:
+  keploy-network:
+    external: true
 
 volumes:
   db_data:
