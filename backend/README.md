@@ -32,6 +32,24 @@ See [http://localhost:8000/docs](http://localhost:8000/docs) for interactive API
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
+## How to Run Tests
+
+1. **Install test dependencies:**
+   ```sh
+   pip install uv && uv init
+   ```
+   (You should already have `fastapi` and `sqlalchemy` from the main requirements.)
+
+2. **Run all tests:**
+   ```sh
+   pytest tests/
+   ```
+
+- Unit tests for database logic are in `tests/test_db_ops.py` and `tests/test_unit.py`.
+- API/integration tests for endpoints are in `tests/test_api.py` (uses FastAPI's TestClient).
+
+> **Note:** Ensure your database is running and environment variables are set before running tests.
+
 ## Interacting with the API
 
 - Use the React frontend to add, view, edit, and delete courses.
