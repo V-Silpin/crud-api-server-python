@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from db.ops import PostgresOps
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 router = APIRouter()
 
@@ -9,46 +9,124 @@ db = PostgresOps()
 
 db.create_table("items", ["id", "name", "description", "price"])
 
-class Course(BaseModel):
-    id: int
-    name: str
-    description: str
-    price: float
+class CourseBase(BaseModel):
+    name: str = Field(..., description="The name of the course", example="Python Programming")
+    description: str = Field(..., description="Course description", example="Learn Python from basics to advanced")
+    price: float = Field(..., gt=0, description="Course price in USD", example=99.99)
+
+class Course(CourseBase):
+    id: int = Field(..., description="Unique identifier for the course", example=1)
+
+class CourseCreate(CourseBase):
+    id: int = Field(..., description="Unique identifier for the course", example=1)
+
+class CourseUpdate(BaseModel):
+    name: Optional[str] = Field(None, description="The name of the course", example="Python Programming")
+    description: Optional[str] = Field(None, description="Course description", example="Learn Python from basics to advanced")
+    price: Optional[float] = Field(None, gt=0, description="Course price in USD", example=99.99)
+
+class CourseResponse(BaseModel):
+    message: str
+    course: Course
+
+class MessageResponse(BaseModel):
+    message: str
     
 
-@router.post("/items/")
-def create_item(item: Course):
+@router.post("/items/", response_model=CourseResponse, status_code=201)
+def create_item(
+    item: CourseCreate,
+    summary="Create a new course",
+    description="Create a new course with the provided details"
+):
+    """
+    Create a new course with all the information:
+    
+    - **id**: Unique identifier for the course
+    - **name**: Course name
+    - **description**: Detailed course description
+    - **price**: Course price (must be greater than 0)
+    """
     try:
         db.insert_data("items", [item.id, item.name, item.description, item.price])
-        return {"message": "Course created successfully!", "course": item.dict()}
+        course = Course(id=item.id, name=item.name, description=item.description, price=item.price)
+        return CourseResponse(message="Course created successfully!", course=course)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/items/")
-def read_items():
+@router.get("/items/", response_model=List[Course])
+def read_items(
+    summary="Get all courses",
+    description="Retrieve a list of all available courses"
+):
+    """
+    Retrieve all courses from the database.
+    
+    Returns a list of courses with their details.
+    """
     try:
         courses = db.fetch_data("items")
         return courses
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/items/{item_id}")
-def update_item(item_id: int, item: Course):
+@router.put("/items/{item_id}", response_model=CourseResponse)
+def update_item(
+    item_id: int,
+    item: CourseUpdate,
+    summary="Update a course",
+    description="Update an existing course by ID"
+):
+    """
+    Update a course with new information:
+    
+    - **item_id**: The ID of the course to update
+    - **name**: New course name (optional)
+    - **description**: New course description (optional)
+    - **price**: New course price (optional, must be greater than 0)
+    """
     try:
-        db.update_data(
-            "items",
-            {"name": item.name, "description": item.description, "price": item.price},
-            {"id": item_id}
-        )
-        return {"message": "Course updated successfully!", "course": item.dict()}
+        update_data = {}
+        if item.name is not None:
+            update_data["name"] = item.name
+        if item.description is not None:
+            update_data["description"] = item.description
+        if item.price is not None:
+            update_data["price"] = item.price
+            
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+            
+        db.update_data("items", update_data, {"id": item_id})
+        
+        # Fetch updated course
+        updated_courses = db.fetch_data("items")
+        updated_course = next((c for c in updated_courses if c["id"] == item_id), None)
+        
+        if not updated_course:
+            raise HTTPException(status_code=404, detail="Course not found")
+            
+        course = Course(**updated_course)
+        return CourseResponse(message="Course updated successfully!", course=course)
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.delete("/items/{item_id}")
-def delete_item(item_id: int):
+@router.delete("/items/{item_id}", response_model=MessageResponse)
+def delete_item(
+    item_id: int,
+    summary="Delete a course",
+    description="Delete a course by ID"
+):
+    """
+    Delete a course from the database.
+    
+    - **item_id**: The ID of the course to delete
+    """
     try:
         db.delete_data("items", {"id": item_id})
-        return {"message": "Course deleted successfully!"}
+        return MessageResponse(message="Course deleted successfully!")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
