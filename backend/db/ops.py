@@ -4,18 +4,46 @@ import os
 from dotenv import load_dotenv
 
 class SQLAlchemyOps:
-    def __init__(self):
+    def __init__(self, database_url=None):
         load_dotenv()
-        database = os.getenv("DB_NAME")
-        host = os.getenv("DB_HOST")
-        user = os.getenv("DB_USER")
-        password = os.getenv("DB_PASS")
-        port = os.getenv("DB_PORT")
-        url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
-        self.engine = create_engine(url)
-        self.metadata = MetaData()
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = self.Session()
+        
+        if database_url:
+            # Use provided database URL (useful for testing)
+            url = database_url
+        else:
+            # Build URL from environment variables with defaults
+            database = os.getenv("DB_NAME", "postgres")
+            host = os.getenv("DB_HOST", "localhost")
+            user = os.getenv("DB_USER", "postgres")
+            password = os.getenv("DB_PASS", "postgres")
+            port = os.getenv("DB_PORT", "5432")
+            
+            # Validate environment variables
+            if not all([database, host, user, password, port]):
+                missing_vars = []
+                if not database: missing_vars.append("DB_NAME")
+                if not host: missing_vars.append("DB_HOST")
+                if not user: missing_vars.append("DB_USER")
+                if not password: missing_vars.append("DB_PASS")
+                if not port: missing_vars.append("DB_PORT")
+                
+                raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+            
+            # Validate port is numeric
+            try:
+                port = int(port)
+            except ValueError:
+                raise ValueError(f"DB_PORT must be a valid integer, got: {port}")
+            
+            url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+        
+        try:
+            self.engine = create_engine(url)
+            self.metadata = MetaData()
+            self.Session = sessionmaker(bind=self.engine)
+            self.session = self.Session()
+        except Exception as e:
+            raise ConnectionError(f"Failed to connect to database: {e}")
 
     def create_table(self, table_name, columns):
         table = Table(

@@ -2,12 +2,25 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from db.ops import PostgresOps
 from typing import List, Dict, Any, Optional
+import os
 
 router = APIRouter()
 
-db = PostgresOps()
-
-db.create_table("items", ["id", "name", "description", "price"])
+# Initialize database connection with environment variable support
+try:
+    # Check if DATABASE_URL is provided (common in CI/CD environments)
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        db = PostgresOps(database_url=database_url)
+    else:
+        db = PostgresOps()
+    
+    # Create table if it doesn't exist
+    db.create_table("items", ["id", "name", "description", "price"])
+except Exception as e:
+    print(f"Warning: Database connection failed: {e}")
+    print("Some endpoints may not work properly without a database connection.")
+    db = None
 
 class CourseBase(BaseModel):
     name: str = Field(..., description="The name of the course", example="Python Programming")
@@ -120,6 +133,9 @@ def create_item(
     - **description**: Detailed course description
     - **price**: Course price (must be greater than 0)
     """
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database connection not available")
+    
     try:
         db.insert_data("items", [item.id, item.name, item.description, item.price])
         course = Course(id=item.id, name=item.name, description=item.description, price=item.price)
@@ -189,6 +205,9 @@ def read_items(
     
     Returns a list of courses with their details.
     """
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database connection not available")
+    
     try:
         courses = db.fetch_data("items")
         return courses
@@ -210,6 +229,9 @@ def update_item(
     - **description**: New course description (optional)
     - **price**: New course price (optional, must be greater than 0)
     """
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database connection not available")
+    
     try:
         update_data = {}
         if item.name is not None:
@@ -250,6 +272,9 @@ def delete_item(
     
     - **item_id**: The ID of the course to delete
     """
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database connection not available")
+    
     try:
         db.delete_data("items", {"id": item_id})
         return MessageResponse(message="Course deleted successfully!")
