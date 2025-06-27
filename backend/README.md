@@ -12,10 +12,47 @@ This backend is part of a full-stack CRUD application for managing courses. It i
 
 ## API Endpoints
 
-- `POST /items/` — Create a new course
-- `GET /items/` — List all courses
-- `PUT /items/{item_id}` — Update a course
-- `DELETE /items/{item_id}` — Delete a course
+- `POST /api/v1/items/` — Create a new course
+- `GET /api/v1/items/` — List all courses
+- `PUT /api/v1/items/{item_id}` — Update a course
+- `DELETE /api/v1/items/{item_id}` — Delete a course
+
+## OpenAPI Documentation
+
+FastAPI automatically generates OpenAPI (Swagger) documentation for your API:
+
+- **Interactive API Documentation (Swagger UI)**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Alternative Documentation (ReDoc)**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **OpenAPI JSON Schema**: [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
+
+### Exporting OpenAPI Schema
+
+To export the OpenAPI schema to a JSON file:
+
+```sh
+python export_openapi.py
+```
+
+This will create an `openapi_schema.json` file with your complete API specification.
+
+### Generating Client Code
+
+You can generate client libraries in various programming languages from your OpenAPI schema:
+
+1. **Install the OpenAPI Generator CLI:**
+   ```sh
+   npm install @openapitools/openapi-generator-cli -g
+   ```
+
+2. **Generate a client (Python example):**
+   ```sh
+   python generate_client.py python
+   ```
+
+3. **List supported languages:**
+   ```sh
+   python generate_client.py --list
+   ```
 
 See [http://localhost:8000/docs](http://localhost:8000/docs) for interactive API documentation (Swagger UI).
 
