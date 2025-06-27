@@ -1,10 +1,12 @@
 """
 OpenAPI configuration and utilities for the CRUD API Server.
+Includes curl snippets and response examples.
 """
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from typing import Dict, Any
+import json
 
 def custom_openapi(app: FastAPI) -> Dict[str, Any]:
     """
@@ -69,7 +71,7 @@ def custom_openapi(app: FastAPI) -> Dict[str, Any]:
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-# Example response schemas for better documentation
+# Example response schemas for better documentation with curl snippets
 EXAMPLE_RESPONSES = {
     "course_created": {
         "description": "Course created successfully",
@@ -83,6 +85,112 @@ EXAMPLE_RESPONSES = {
                         "description": "Learn Python from basics to advanced",
                         "price": 99.99
                     }
+                },
+                "examples": {
+                    "successful_creation": {
+                        "summary": "Successful course creation",
+                        "description": "Example of a successful course creation response",
+                        "value": {
+                            "message": "Course created successfully!",
+                            "course": {
+                                "id": 1,
+                                "name": "Python Programming",
+                                "description": "Learn Python from basics to advanced",
+                                "price": 99.99
+                            }
+                        }
+                    },
+                    "web_development_course": {
+                        "summary": "Web Development Course",
+                        "description": "Example of creating a web development course",
+                        "value": {
+                            "message": "Course created successfully!",
+                            "course": {
+                                "id": 2,
+                                "name": "Full Stack Web Development",
+                                "description": "Complete MERN stack development course",
+                                "price": 149.99
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "courses_list": {
+        "description": "List of all courses",
+        "content": {
+            "application/json": {
+                "example": [
+                    {
+                        "id": 1,
+                        "name": "Python Programming",
+                        "description": "Learn Python from basics to advanced",
+                        "price": 99.99
+                    },
+                    {
+                        "id": 2,
+                        "name": "Full Stack Web Development",
+                        "description": "Complete MERN stack development course",
+                        "price": 149.99
+                    }
+                ],
+                "examples": {
+                    "multiple_courses": {
+                        "summary": "Multiple courses",
+                        "description": "Example response with multiple courses",
+                        "value": [
+                            {
+                                "id": 1,
+                                "name": "Python Programming",
+                                "description": "Learn Python from basics to advanced",
+                                "price": 99.99
+                            },
+                            {
+                                "id": 2,
+                                "name": "Full Stack Web Development",
+                                "description": "Complete MERN stack development course",
+                                "price": 149.99
+                            },
+                            {
+                                "id": 3,
+                                "name": "Data Science with Python",
+                                "description": "Machine learning and data analysis",
+                                "price": 199.99
+                            }
+                        ]
+                    },
+                    "empty_list": {
+                        "summary": "No courses",
+                        "description": "Response when no courses exist",
+                        "value": []
+                    }
+                }
+            }
+        }
+    },
+    "course_updated": {
+        "description": "Course updated successfully",
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "Course updated successfully!",
+                    "course": {
+                        "id": 1,
+                        "name": "Advanced Python Programming",
+                        "description": "Learn Python from basics to expert level",
+                        "price": 129.99
+                    }
+                }
+            }
+        }
+    },
+    "course_deleted": {
+        "description": "Course deleted successfully",
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "Course deleted successfully!"
                 }
             }
         }
@@ -115,3 +223,81 @@ EXAMPLE_RESPONSES = {
         }
     }
 }
+
+def generate_curl_examples():
+    """Generate curl command examples for all endpoints."""
+    base_url = "http://localhost:8000/api/v1"
+    
+    curl_examples = {
+        "create_course": {
+            "description": "Create a new course",
+            "curl": f'''curl -X POST "{base_url}/items/" \\
+  -H "Content-Type: application/json" \\
+  -d '{{
+    "id": 1,
+    "name": "Python Programming",
+    "description": "Learn Python from basics to advanced",
+    "price": 99.99
+  }}'
+''',
+            "response": '''{
+  "message": "Course created successfully!",
+  "course": {
+    "id": 1,
+    "name": "Python Programming",
+    "description": "Learn Python from basics to advanced",
+    "price": 99.99
+  }
+}'''
+        },
+        "get_all_courses": {
+            "description": "Get all courses",
+            "curl": f'''curl -X GET "{base_url}/items/" \\
+  -H "Accept: application/json"
+''',
+            "response": '''[
+  {
+    "id": 1,
+    "name": "Python Programming",
+    "description": "Learn Python from basics to advanced",
+    "price": 99.99
+  },
+  {
+    "id": 2,
+    "name": "Full Stack Web Development",
+    "description": "Complete MERN stack development course",
+    "price": 149.99
+  }
+]'''
+        },
+        "update_course": {
+            "description": "Update an existing course",
+            "curl": f'''curl -X PUT "{base_url}/items/1" \\
+  -H "Content-Type: application/json" \\
+  -d '{{
+    "name": "Advanced Python Programming",
+    "price": 129.99
+  }}'
+''',
+            "response": '''{
+  "message": "Course updated successfully!",
+  "course": {
+    "id": 1,
+    "name": "Advanced Python Programming",
+    "description": "Learn Python from basics to advanced",
+    "price": 129.99
+  }
+}'''
+        },
+        "delete_course": {
+            "description": "Delete a course",
+            "curl": f'''curl -X DELETE "{base_url}/items/1" \\
+  -H "Accept: application/json"
+''',
+            "response": '''{
+  "message": "Course deleted successfully!"
+}'''
+        }
+    }
+    
+    return curl_examples
