@@ -33,7 +33,80 @@ class MessageResponse(BaseModel):
     message: str
     
 
-@router.post("/items/", response_model=CourseResponse, status_code=201)
+@router.post("/items/", response_model=CourseResponse, status_code=201,
+            responses={
+                201: {
+                    "description": "Course created successfully",
+                    "content": {
+                        "application/json": {
+                            "examples": {
+                                "python_course": {
+                                    "summary": "Python Programming Course",
+                                    "description": "Example of creating a Python course",
+                                    "value": {
+                                        "message": "Course created successfully!",
+                                        "course": {
+                                            "id": 1,
+                                            "name": "Python Programming",
+                                            "description": "Learn Python from basics to advanced",
+                                            "price": 99.99
+                                        }
+                                    }
+                                },
+                                "web_dev_course": {
+                                    "summary": "Web Development Course", 
+                                    "description": "Example of creating a web development course",
+                                    "value": {
+                                        "message": "Course created successfully!",
+                                        "course": {
+                                            "id": 2,
+                                            "name": "Full Stack Web Development",
+                                            "description": "Complete MERN stack development course",
+                                            "price": 149.99
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                422: {
+                    "description": "Validation Error",
+                    "content": {
+                        "application/json": {
+                            "examples": {
+                                "invalid_price": {
+                                    "summary": "Invalid Price",
+                                    "description": "Price must be greater than 0",
+                                    "value": {
+                                        "detail": [
+                                            {
+                                                "loc": ["body", "price"],
+                                                "msg": "ensure this value is greater than 0",
+                                                "type": "value_error.number.not_gt",
+                                                "ctx": {"limit_value": 0}
+                                            }
+                                        ]
+                                    }
+                                },
+                                "missing_fields": {
+                                    "summary": "Missing Required Fields",
+                                    "description": "Required fields are missing",
+                                    "value": {
+                                        "detail": [
+                                            {
+                                                "loc": ["body", "name"],
+                                                "msg": "field required",
+                                                "type": "value_error.missing"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
 def create_item(
     item: CourseCreate,
     summary="Create a new course",
@@ -54,7 +127,59 @@ def create_item(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/items/", response_model=List[Course])
+@router.get("/items/", response_model=List[Course],
+           responses={
+               200: {
+                   "description": "List of all courses",
+                   "content": {
+                       "application/json": {
+                           "examples": {
+                               "multiple_courses": {
+                                   "summary": "Multiple Courses",
+                                   "description": "Example response with multiple courses",
+                                   "value": [
+                                       {
+                                           "id": 1,
+                                           "name": "Python Programming",
+                                           "description": "Learn Python from basics to advanced",
+                                           "price": 99.99
+                                       },
+                                       {
+                                           "id": 2,
+                                           "name": "Full Stack Web Development",
+                                           "description": "Complete MERN stack development course",
+                                           "price": 149.99
+                                       },
+                                       {
+                                           "id": 3,
+                                           "name": "Data Science with Python",
+                                           "description": "Machine learning and data analysis",
+                                           "price": 199.99
+                                       }
+                                   ]
+                               },
+                               "empty_list": {
+                                   "summary": "Empty Course List",
+                                   "description": "Response when no courses exist",
+                                   "value": []
+                               },
+                               "single_course": {
+                                   "summary": "Single Course",
+                                   "description": "Response with only one course",
+                                   "value": [
+                                       {
+                                           "id": 1,
+                                           "name": "Python Programming",
+                                           "description": "Learn Python from basics to advanced",
+                                           "price": 99.99
+                                       }
+                                   ]
+                               }
+                           }
+                       }
+                   }
+               }
+           })
 def read_items(
     summary="Get all courses",
     description="Retrieve a list of all available courses"
