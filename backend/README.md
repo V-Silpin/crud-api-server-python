@@ -54,6 +54,53 @@ You can generate client libraries in various programming languages from your Ope
    python generate_client.py --list
    ```
 
+### Curl Examples and Testing
+
+Generate comprehensive curl snippets with response examples:
+
+```sh
+# Generate curl examples in markdown and JSON format
+python generate_curl_snippets.py
+```
+
+This creates:
+- `curl_examples.md` - Human-readable examples with responses
+- `curl_examples.json` - Machine-readable format
+
+**Test your API with automated curl tests:**
+
+```sh
+# Run automated tests against your running API
+python test_curl_examples.py
+```
+
+**Quick curl examples:**
+
+```bash
+# Create a course
+curl -X POST "http://localhost:8000/api/v1/items/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 1,
+    "name": "Python Programming",
+    "description": "Learn Python from basics to advanced",
+    "price": 99.99
+  }'
+
+# Get all courses
+curl -X GET "http://localhost:8000/api/v1/items/" \
+  -H "Accept: application/json"
+
+# Update a course
+curl -X PUT "http://localhost:8000/api/v1/items/1" \
+  -H "Content-Type: application/json" \
+  -d '{"price": 129.99}'
+
+# Delete a course
+curl -X DELETE "http://localhost:8000/api/v1/items/1" \
+  -H "Accept: application/json"
+```
+
 See [http://localhost:8000/docs](http://localhost:8000/docs) for interactive API documentation (Swagger UI).
 
 ## How to Run (Standalone)
