@@ -1,9 +1,25 @@
 from fastapi import FastAPI
 from api.routes import router
+from openapi_config import custom_openapi
 import uvicorn
 
-app = FastAPI()
-app.include_router(router)
+app = FastAPI(
+    title="CRUD API Server",
+    description="A FastAPI application for managing courses with full CRUD operations",
+    version="1.0.0",
+    contact={
+        "name": "Your Name",
+        "email": "your.email@example.com",
+    },
+    license_info={
+        "name": "MIT",
+    },
+)
+
+# Set custom OpenAPI schema
+app.openapi = lambda: custom_openapi(app)
+
+app.include_router(router, prefix="/api/v1", tags=["courses"])
 
 def main():
     print("Hello from crud-api-server-python!")
