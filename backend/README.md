@@ -105,16 +105,60 @@ See [http://localhost:8000/docs](http://localhost:8000/docs) for interactive API
 
 ## How to Run (Standalone)
 
-1. **Install dependencies:**
+1. **Set up environment variables:**
+   ```sh
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env with your database configuration
+   # Required variables:
+   # DB_NAME=your_database_name
+   # DB_HOST=localhost
+   # DB_USER=your_username  
+   # DB_PASS=your_password
+   # DB_PORT=5432
+   #
+   # Or use a single DATABASE_URL:
+   # DATABASE_URL=postgresql://username:password@localhost:5432/database
+   ```
+
+2. **Install dependencies:**
    ```sh
    pip install -r requirements.txt
    ```
-2. **Set up environment variables:**
-   - Create a `.env` file with your database connection details if needed.
+
 3. **Start the server:**
    ```sh
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
+
+## Environment Variables
+
+The application supports two ways to configure the database connection:
+
+### Option 1: Individual Environment Variables
+```bash
+DB_NAME=postgres          # Database name
+DB_HOST=localhost         # Database host
+DB_USER=postgres          # Database username
+DB_PASS=postgres          # Database password
+DB_PORT=5432             # Database port
+```
+
+### Option 2: Database URL (Recommended for Production)
+```bash
+DATABASE_URL=postgresql://username:password@host:port/database
+```
+
+**Note:** If both are provided, `DATABASE_URL` takes precedence.
+
+### Default Values
+If environment variables are not set, the following defaults are used:
+- DB_NAME: `postgres`
+- DB_HOST: `localhost`
+- DB_USER: `postgres`
+- DB_PASS: `postgres`
+- DB_PORT: `5432`
 
 ## How to Run Tests
 
