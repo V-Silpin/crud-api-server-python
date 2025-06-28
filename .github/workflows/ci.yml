@@ -56,6 +56,11 @@ jobs:
       working-directory: ./backend
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        DB_NAME: test_db
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASS: postgres
+        DB_PORT: 5432
       run: |
         source .venv/bin/activate
         pytest tests/ -v --tb=short
@@ -64,6 +69,11 @@ jobs:
       working-directory: ./backend
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        DB_NAME: test_db
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASS: postgres
+        DB_PORT: 5432
       run: |
         source .venv/bin/activate
         # Start the server in background
