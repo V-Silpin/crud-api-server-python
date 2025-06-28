@@ -21,8 +21,8 @@ COPY . .
 # Set up PostgreSQL with credentials from .env file
 USER postgres
 RUN /etc/init.d/postgresql start && \
-    psql --command "CREATE USER postgres WITH SUPERUSER PASSWORD 'postgres';" && \
-    createdb -O postgres appdb
+    psql --command "ALTER USER postgres PASSWORD 'postgres';" && \
+    createdb appdb
 
 # Switch back to root user
 USER root
