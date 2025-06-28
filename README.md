@@ -42,3 +42,8 @@ This project is a full-stack CRUD (Create, Read, Update, Delete) web application
 ```sh
 docker compose down
 ```
+
+### API Test Suite Screenshots
+
+![Testcase1](img/testcase1.png)
+![Testcase2](img/testcase2.png)
